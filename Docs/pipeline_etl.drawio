@@ -1,0 +1,137 @@
+<mxfile host="app.diagrams.net" modified="2026-08-31T12:00:00.000Z" agent="Mozilla/5.0" version="24.7.17" type="device">
+  <diagram name="Pipeline ETL" id="pipeline-etl-cruises">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Pipeline de Datos — Cruise Revenue &amp; Booking Analytics" style="text;html=1;fontSize=22;fontStyle=1;align=center;verticalAlign=middle;fontColor=#1F3864;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1520" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Kaggle → pandas → PostgreSQL (esquema estrella) → Power BI" style="text;html=1;fontSize=13;align=center;verticalAlign=middle;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="58" width="1520" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane_source" value="FUENTE" style="swimlane;html=1;startSize=30;horizontal=1;fontSize=13;fontStyle=1;fillColor=#F2F2F2;strokeColor=#B3B3B3;fontColor=#333333;swimlaneFillColor=#FAFAFA;" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="240" height="640" as="geometry" />
+        </mxCell>
+        <mxCell id="src_kaggle" value="Kaggle Datasets&#10;&#10;Dominio: turismo / cruceros" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#20BEFF;strokeColor=none;fontColor=#FFFFFF;fontSize=12;fontStyle=1;verticalAlign=middle;" vertex="1" parent="lane_source">
+          <mxGeometry x="30" y="60" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="src_csv" value="cruises_unclean.csv&#10;&#10;77.040 filas × 20 columnas&#10;Encabezados en español&#10;Valores de ruta mezclados" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#666666;fontSize=11;align=left;spacingLeft=10;verticalAlign=middle;" vertex="1" parent="lane_source">
+          <mxGeometry x="30" y="170" width="180" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="src_check" value="Validación de requisitos&#10;&#10;✓ &gt; 1.000 filas&#10;✓ &gt; 5 columnas&#10;✓ 2 columnas fecha&#10;✓ 6 categóricas / 8 numéricas" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#43A047;fontSize=10;align=left;spacingLeft=10;verticalAlign=middle;" vertex="1" parent="lane_source">
+          <mxGeometry x="30" y="300" width="180" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane_extract" value="EXTRACT" style="swimlane;html=1;startSize=30;horizontal=1;fontSize=13;fontStyle=1;fillColor=#FFF4E5;strokeColor=#E8A33D;fontColor=#8A5A00;swimlaneFillColor=#FFFBF5;" vertex="1" parent="1">
+          <mxGeometry x="310" y="110" width="230" height="640" as="geometry" />
+        </mxCell>
+        <mxCell id="ext_read" value="pandas.read_csv()&#10;&#10;analisis_cruiseship.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E8A33D;fontSize=12;fontStyle=1;" vertex="1" parent="lane_extract">
+          <mxGeometry x="25" y="60" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ext_profile" value="Perfilado inicial&#10;&#10;df.shape&#10;df.info()&#10;df.describe()&#10;df.isnull().sum()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E8A33D;fontSize=11;align=left;spacingLeft=10;" vertex="1" parent="lane_extract">
+          <mxGeometry x="25" y="170" width="180" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="ext_out" value="DataFrame en memoria&#10;77.040 × 20" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#999999;fontSize=11;dashed=1;" vertex="1" parent="lane_extract">
+          <mxGeometry x="25" y="310" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane_transform" value="TRANSFORM" style="swimlane;html=1;startSize=30;horizontal=1;fontSize=13;fontStyle=1;fillColor=#E7F0FB;strokeColor=#4A86C8;fontColor=#1F3864;swimlaneFillColor=#F5F9FE;" vertex="1" parent="1">
+          <mxGeometry x="570" y="110" width="330" height="640" as="geometry" />
+        </mxCell>
+        <mxCell id="tr_names" value="1. Normalización de nombres&#10;&#10;columnas_map → snake_case (EN)&#10;RES_ID → booking_id&#10;Compañia → company" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4A86C8;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="lane_transform">
+          <mxGeometry x="25" y="45" width="280" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="tr_values" value="2. Homologación de valores&#10;&#10;route_type.replace()&#10;Mediterráneo → Mediterranean" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4A86C8;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="lane_transform">
+          <mxGeometry x="25" y="130" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tr_types" value="3. Corrección de tipos&#10;&#10;pd.to_datetime(travel_date)&#10;pd.to_datetime(booking_date)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4A86C8;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="lane_transform">
+          <mxGeometry x="25" y="205" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tr_dupes" value="4. Limpieza&#10;&#10;Auditoría de nulos&#10;drop_duplicates() + reporte de delta" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4A86C8;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="lane_transform">
+          <mxGeometry x="25" y="280" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tr_derived" value="5. Columnas derivadas&#10;&#10;total_guest_spending_usd&#10;   = gasto_diario × noches × pasajeros&#10;price_category&#10;   = pd.qcut(ingreso, q=3) → Low/Med/High" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D6E4F7;strokeColor=#1F3864;fontSize=10;align=left;spacingLeft=10;fontStyle=1;" vertex="1" parent="lane_transform">
+          <mxGeometry x="25" y="355" width="280" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="tr_star" value="6. Normalización a esquema estrella&#10;&#10;drop_duplicates() por dimensión&#10;Claves subrogadas con range()&#10;merge(how=&quot;left&quot;) para reincorporar IDs" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D6E4F7;strokeColor=#1F3864;fontSize=10;align=left;spacingLeft=10;fontStyle=1;" vertex="1" parent="lane_transform">
+          <mxGeometry x="25" y="455" width="280" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tr_out" value="5 dimensiones + 1 tabla de hechos" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#999999;fontSize=11;dashed=1;" vertex="1" parent="lane_transform">
+          <mxGeometry x="25" y="555" width="280" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane_load" value="LOAD" style="swimlane;html=1;startSize=30;horizontal=1;fontSize=13;fontStyle=1;fillColor=#E8F5E9;strokeColor=#43A047;fontColor=#1B5E20;swimlaneFillColor=#F5FBF6;" vertex="1" parent="1">
+          <mxGeometry x="930" y="110" width="300" height="640" as="geometry" />
+        </mxCell>
+        <mxCell id="ld_contract" value="Contrato de datos&#10;(_validar_star_schema)&#10;&#10;✓ Columnas exactas por tabla&#10;✓ PKs sin duplicados&#10;✓ FKs sin nulos&#10;&#10;⚠ Aborta la carga si falla" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=10;align=left;spacingLeft=10;fontStyle=1;" vertex="1" parent="lane_load">
+          <mxGeometry x="25" y="45" width="250" height="115" as="geometry" />
+        </mxCell>
+        <mxCell id="ld_engine" value="SQLAlchemy + psycopg2&#10;&#10;create_engine(URL.create(...))&#10;postgres.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#43A047;fontSize=11;fontStyle=1;" vertex="1" parent="lane_load">
+          <mxGeometry x="25" y="180" width="250" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="ld_tx" value="Transacción atómica&#10;with engine.begin()&#10;&#10;1. DROP TABLE ... CASCADE (idempotente)&#10;2. DDL: dimensiones → hechos&#10;3. INSERT dimensiones&#10;4. INSERT hechos (chunksize=5000)&#10;5. CREATE INDEX (post-inserción)&#10;6. Validación de conteos" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#43A047;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="lane_load">
+          <mxGeometry x="25" y="265" width="250" height="135" as="geometry" />
+        </mxCell>
+        <mxCell id="ld_ck" value="CHECK constraints en el motor&#10;&#10;nights_of_stay &gt; 0&#10;lead_time_days &gt;= 0&#10;satisfaction_score BETWEEN 0 AND 5&#10;importes &gt;= 0" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="lane_load">
+          <mxGeometry x="25" y="420" width="250" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane_db" value="PERSISTENCIA" style="swimlane;html=1;startSize=30;horizontal=1;fontSize=13;fontStyle=1;fillColor=#EDE7F6;strokeColor=#7E57C2;fontColor=#4527A0;swimlaneFillColor=#F8F6FC;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="110" width="300" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="db_pg" value="PostgreSQL — base &quot;cruises&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#336791;strokeColor=none;fontColor=#FFFFFF;fontSize=12;fontStyle=1;" vertex="1" parent="lane_db">
+          <mxGeometry x="25" y="45" width="250" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="db_fact" value="bookings_fact&#10;77.040 filas · PK booking_id&#10;5 FK + fechas + medidas" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D1C4E9;strokeColor=#7E57C2;fontSize=10;fontStyle=1;align=left;spacingLeft=10;" vertex="1" parent="lane_db">
+          <mxGeometry x="25" y="110" width="250" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="db_dims" value="ships_dim (8)&#10;countries_dim (8)&#10;suites_dim (4)&#10;packages_dim (4)&#10;booking_sources_dim (3)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#7E57C2;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="lane_db">
+          <mxGeometry x="25" y="185" width="250" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="db_idx" value="Índices sobre 5 FK + travel_date + booking_date" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#999999;fontSize=10;dashed=1;" vertex="1" parent="lane_db">
+          <mxGeometry x="25" y="295" width="250" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane_bi" value="CONSUMO" style="swimlane;html=1;startSize=30;horizontal=1;fontSize=13;fontStyle=1;fillColor=#FFF8E1;strokeColor=#F2C811;fontColor=#7A6000;swimlaneFillColor=#FFFDF5;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="520" width="300" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="bi_conn" value="Conector nativo PostgreSQL&#10;modo Importar · localhost:5432" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2C811;strokeColor=none;fontColor=#3B3B3B;fontSize=11;fontStyle=1;" vertex="1" parent="lane_bi">
+          <mxGeometry x="25" y="40" width="250" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="bi_pq" value="Power Query: filtro travel_date &lt; 2022-01-01&#10;(excluye año parcial) → 75.000 filas" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F2C811;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="lane_bi">
+          <mxGeometry x="25" y="100" width="250" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="bi_dash" value="Tablero: 5 preguntas · KPI · tendencia&#10;ranking · distribución · segmentadores" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFECB3;strokeColor=#F2C811;fontSize=10;align=left;spacingLeft=10;fontStyle=1;" vertex="1" parent="lane_bi">
+          <mxGeometry x="25" y="160" width="250" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;strokeWidth=2;strokeColor=#666666;endArrow=block;endFill=1;" edge="1" parent="1" source="src_csv" target="ext_read">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;strokeWidth=2;strokeColor=#666666;endArrow=block;endFill=1;" edge="1" parent="1" source="ext_out" target="tr_names">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;strokeWidth=2;strokeColor=#666666;endArrow=block;endFill=1;" edge="1" parent="1" source="tr_out" target="ld_contract">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;strokeWidth=2;strokeColor=#666666;endArrow=block;endFill=1;" edge="1" parent="1" source="ld_tx" target="db_pg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;strokeWidth=2;strokeColor=#666666;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="lane_db" target="lane_bi">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="note_2022" value="Decisión analítica: el dataset se corta el 06-02-2022,&#10;dejando 2022 con solo 2.040 registros frente a ~18.720&#10;de un año completo. Se excluye para evitar un desplome&#10;artificial en la serie temporal. Alcance final: 2018-2021." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#C62828;fontSize=10;align=left;spacingLeft=10;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="930" y="640" width="300" height="90" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend" value="Leyenda:  ▢ blanco = paso de proceso   ▢ amarillo = validación   ▢ gris punteado = artefacto intermedio" style="text;html=1;fontSize=11;align=left;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="770" width="800" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
