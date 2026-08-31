@@ -42,6 +42,8 @@ Here is a breakdown of what that business rationale and methodology actually mea
 
 * **Statistical Balance for Data Science:** By keeping all three categories evenly populated, your database queries (`GROUP BY price_category`) won't suffer from heavily skewed groups, and machine learning models won't become biased toward one overpopulated bucket.
 
+etiquetas de referencia agregar datos en obejto visual
+
 assert df.duplicated().sum() == 0
 assert df['satisfaction_score'].between(0, 5).all()
 print(f"Validación OK — {len(df)} filas, {df.isnull().sum().sum()} nulos")
