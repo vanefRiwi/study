@@ -18,6 +18,30 @@ Para instalarlas se hace con el entorno virtual activo de la siguiente manera `p
 ```
 df = df.dropna(subset=['satisfaction_score'])   # o el criterio que decidas
 
+---
+
+In simple terms, **`price_category`** is a **label that tags every single cruise booking as "Low", "Medium", or "High" spend based on how much revenue it brought in.**
+
+Instead of looking at raw dollars (e.g., "$1,243.50" vs. "$4,810.00"), it groups bookings into three easy-to-understand categories.
+
+Here is a breakdown of what that business rationale and methodology actually mean for your project:
+
+**What the Business Rationale Means**
+
+* **From Raw Numbers to Actionable Groups:** A business manager doesn't want to scan 70,000 unique dollar amounts. Grouping reservations into `Low`, `Medium`, and `High` tiers makes it effortless to answer executive questions like: *"Which ships attract the highest-spending customers?"* or *"Do customers from certain countries book mostly 'Low' or 'High' packages?"*
+* **Targeting & Marketing:** It allows teams to build targeted strategies—like offering luxury upgrades to the **High** group or sending discount promotions to the **Low** group.
+
+---
+
+**What the Methodological Justification Means**
+
+* **Why `pd.qcut` instead of `pd.cut`?:**
+* If you used standard binning (`pd.cut`), you would set fixed dollar cuts (e.g., Low: $0–$1,000, Medium: $1,000–$5,000, High: $5,000+). But if 90% of your bookings happen to fall between $1,000 and $3,000, your "High" and "Low" buckets would be almost empty, making the feature useless.
+* `pd.qcut` (Quantile Cut) fixes this by looking at your actual data distribution and dynamically drawing the lines so that **each of the 3 buckets gets roughly 33.3% of your total records** (a balanced split into *tertiles*).
+
+
+* **Statistical Balance for Data Science:** By keeping all three categories evenly populated, your database queries (`GROUP BY price_category`) won't suffer from heavily skewed groups, and machine learning models won't become biased toward one overpopulated bucket.
+
 assert df.duplicated().sum() == 0
 assert df['satisfaction_score'].between(0, 5).all()
 print(f"Validación OK — {len(df)} filas, {df.isnull().sum().sum()} nulos")
